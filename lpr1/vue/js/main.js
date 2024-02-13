@@ -86,6 +86,10 @@ Vue.component('product-tabs', {
         reviews: {
             type: Array,
             required: false
+        },
+        premium: {
+            type: Boolean,
+            required: true
         }
     },
 
@@ -105,32 +109,84 @@ Vue.component('product-tabs', {
            <p>{{ review.name }}</p>
            <p>Rating: {{ review.rating }}</p>
            <p>{{ review.review }}</p>
+           <p>Recommend? {{ review.recommend }}</p>
            </li>
          </ul>
-       </div>
-       <div v-show="selectedTab === 'Make a Review'">
+        </div>
+        <div v-show="selectedTab === 'Make a Review'">
             <product-review></product-review>       
-       </div>
+        </div>
+        <div v-show="selectedTab === 'Shipping'">
+            <product-shipping></product-shipping>
+        </div>
+        <div v-show="selectedTab === 'Details'">
+            <product-detail></product-detail>
+            <product-detail :details="details" :sizes="sizes"></product-detail>
+        </div>
      </div>
 
  `,
     data() {
         return {
-            tabs: ['Reviews', 'Make a Review'],
-            selectedTab: 'Reviews'  // устанавливается с помощью @click
+            tabs: ['Reviews', 'Make a Review', 'Shipping', 'Details'],
+            selectedTab: 'Reviews',  // устанавливается с помощью @click
+            details: ['80% cotton', '20% polyester', 'Gender-neutral'],
+            sizes: ['S', 'M', 'L', 'XL', 'XXL', 'XXXL'],
+            shipping() {
+            if (this.premium) {
+                return "Free";
+            } else {
+                return 2.99
+                }
+            }
         }
     }
 })
 
-
-
-Vue.component('product', {
-    props: {
+Vue.component('product-shipping', {
+    props:{
         premium: {
             type: Boolean,
             required: true
         }
     },
+    template:`
+    <p>Shipping: {{ shipping }}</p>
+    `,
+    data(){
+        return{
+            shipping() {
+                if (this.premium) {
+                    return "Free";
+                } else {
+                    return 2.99
+                }
+            }
+        }
+    }
+})
+
+Vue.component('product-detail', {
+    props:{
+        details:{
+            type: Array,
+            required: true
+        },
+        sizes:{
+            type: Array,
+            required: true
+        }
+    },
+    template:`
+        <ul>
+            <li v-for="detail in details">{{ detail }}</li>
+            <li v-for="size in sizes">{{ size }}</li>
+        </ul>
+    `
+})
+
+
+Vue.component('product', {
     template: `
    <div class="product">
     <div class="product-image">
@@ -140,11 +196,11 @@ Vue.component('product', {
        <div class="product-info">
            <h1>{{ title }}</h1>
            <p v-if="inStock">In stock</p>
-           <p v-else>Out of Stock</p>
+           <p v-else class="disabledText">Out of Stock</p>
+           <p>{{ sale }}</p>
            <ul>
                <li v-for="detail in details">{{ detail }}</li>
            </ul>
-          <p>Shipping: {{ shipping }}</p>
            <div
                    class="color-box"
                    v-for="(variant, index) in variants"
@@ -159,6 +215,12 @@ Vue.component('product', {
                    :class="{ disabledButton: !inStock }"
            >
                Add to cart
+           </button>
+           <button v-on:click="delFromCart"
+                   :disabled="!inStock"
+                   :class="{ disabledButton: !inStock }"
+           >
+           Delete from cart
            </button>    
        </div>           
        <product-tabs :reviews="reviews"></product-tabs>
@@ -170,19 +232,20 @@ Vue.component('product', {
             brand: 'Vue Mastery',
             selectedVariant: 0,
             altText: "A pair of socks",
-            details: ['80% cotton', '20% polyester', 'Gender-neutral'],
             variants: [
                 {
                     variantId: 2234,
                     variantColor: 'green',
                     variantImage: "./assets/vmSocks-green-onWhite.jpg",
-                    variantQuantity: 10
+                    variantQuantity: 10,
+                    variantOnSale: 1
                 },
                 {
                     variantId: 2235,
                     variantColor: 'blue',
                     variantImage: "./assets/vmSocks-blue-onWhite.jpg",
-                    variantQuantity: 0
+                    variantQuantity: 0,
+                    variantOnSale: 0
                 }
             ],
             reviews: []
@@ -198,10 +261,14 @@ Vue.component('product', {
         addToCart() {
             this.$emit('add-to-cart', this.variants[this.selectedVariant].variantId);
         },
+        delFromCart(){
+            this.$emit('del-from-cart',
+                this.variants[this.selectedVariant].variantId);
+        },
         updateProduct(index) {
             this.selectedVariant = index;
             console.log(index);
-        }
+        },
     },
     computed: {
         title() {
@@ -213,11 +280,11 @@ Vue.component('product', {
         inStock() {
             return this.variants[this.selectedVariant].variantQuantity
         },
-        shipping() {
-            if (this.premium) {
-                return "Free";
+        sale(){
+            if(this.variants[this.selectedVariant].variantOnSale == 1){
+                return this.brand + ' ' + this.product + ' now on sale!!!';
             } else {
-                return 2.99
+                return this.brand + ' ' + this.product + ' no sale :(';
             }
         }
     }
@@ -231,6 +298,9 @@ let app = new Vue({
     methods: {
         updateCart(id) {
             this.cart.push(id);
+        },
+        deleteFromCart(id){
+            this.cart.pop(id);
         }
     }
 })
