@@ -12,11 +12,11 @@
     <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
-<div id="app">
-    <div class="cart">
-        <p>Cart({{ cart.length }})</p>
+    <div id="app">
+        <div class="cart">
+            <p>Cart({{ cart.length }})</p>
+        </div>
+        <product :premium="premium" @add-to-cart="updateCart"></product>
     </div>
-    <product :premium="premium" @add-to-cart="updateCart" @del-from-cart="deleteFromCart"></product>
-</div>
 </body>
 </html>
