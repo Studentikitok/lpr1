@@ -117,11 +117,11 @@ Vue.component('product-tabs', {
             <product-review></product-review>       
         </div>
         <div v-show="selectedTab === 'Shipping'">
-            <product-shipping></product-shipping>
+            <product-shipping :premium="premium"></product-shipping>
         </div>
         <div v-show="selectedTab === 'Details'">
             <product-detail></product-detail>
-            <product-detail :details="details" :sizes="sizes"></product-detail>
+            <product-detail :details="details" :sizes="sizes" :link="link" :description="description"></product-detail>
         </div>
      </div>
 
@@ -132,35 +132,23 @@ Vue.component('product-tabs', {
             selectedTab: 'Reviews',  // устанавливается с помощью @click
             details: ['80% cotton', '20% polyester', 'Gender-neutral'],
             sizes: ['S', 'M', 'L', 'XL', 'XXL', 'XXXL'],
-            shipping() {
+            link: "https://www.amazon.com/s/ref=nb_sb_noss?url=search-alias%3Daps&field-keywords=socks",
+            description: "A pair of warm, fuzzy socks"
+        }
+    },
+
+})
+
+Vue.component('product-shipping', {
+    template:`
+    <p>Shipping: {{ shipping }}</p>
+    `,
+    computed: {
+        shipping() {
             if (this.premium) {
                 return "Free";
             } else {
                 return 2.99
-                }
-            }
-        }
-    }
-})
-
-Vue.component('product-shipping', {
-    props:{
-        premium: {
-            type: Boolean,
-            required: true
-        }
-    },
-    template:`
-    <p>Shipping: {{ shipping }}</p>
-    `,
-    data(){
-        return{
-            shipping() {
-                if (this.premium) {
-                    return "Free";
-                } else {
-                    return 2.99
-                }
             }
         }
     }
@@ -168,6 +156,10 @@ Vue.component('product-shipping', {
 
 Vue.component('product-detail', {
     props:{
+        description:{
+            type: String,
+            required: true
+        },
         details:{
             type: Array,
             required: true
@@ -175,14 +167,30 @@ Vue.component('product-detail', {
         sizes:{
             type: Array,
             required: true
-        }
+        },
+        link:{
+            type: "https://www.amazon.com/s/ref=nb_sb_noss?url=search-alias%3Daps&field-keywords=socks"
+        },
+
     },
+
     template:`
+        <p>{{ description }}</p>
         <ul>
             <li v-for="detail in details">{{ detail }}</li>
             <li v-for="size in sizes">{{ size }}</li>
         </ul>
-    `
+        <div class="product-link">
+            <a :href="{{ link }}">More product like this</a>
+        </div>
+        
+    `,
+    data(){
+        return{
+            link: "https://www.amazon.com/s/ref=nb_sb_noss?url=search-alias%3Daps&field-keywords=socks",
+            description: "A pair of warm, fuzzy socks"
+        }
+    }
 })
 
 
