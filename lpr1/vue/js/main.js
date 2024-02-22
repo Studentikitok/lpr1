@@ -87,8 +87,8 @@ Vue.component('product-tabs', {
             type: Array,
             required: false
         },
-        premium: {
-            type: Boolean,
+        shipping:{
+            type: String,
             required: true
         }
     },
@@ -117,7 +117,7 @@ Vue.component('product-tabs', {
             <product-review></product-review>       
         </div>
         <div v-show="selectedTab === 'Shipping'">
-            <product-shipping :premium="premium"></product-shipping>
+            <p>Shipping: {{ shipping }}</p>
         </div>
         <div v-show="selectedTab === 'Details'">
             <product-detail></product-detail>
@@ -137,21 +137,6 @@ Vue.component('product-tabs', {
         }
     },
 
-})
-
-Vue.component('product-shipping', {
-    template:`
-    <p>Shipping: {{ shipping }}</p>
-    `,
-    computed: {
-        shipping() {
-            if (this.premium) {
-                return "Free";
-            } else {
-                return 2.99
-            }
-        }
-    }
 })
 
 Vue.component('product-detail', {
@@ -195,6 +180,12 @@ Vue.component('product-detail', {
 
 
 Vue.component('product', {
+    props:{
+        premium: {
+            type: Boolean,
+            required: true
+        }
+    },
     template: `
    <div class="product">
     <div class="product-image">
@@ -231,7 +222,7 @@ Vue.component('product', {
            Delete from cart
            </button>    
        </div>           
-       <product-tabs :reviews="reviews"></product-tabs>
+       <product-tabs :reviews="reviews" :shipping="shipping"></product-tabs>
        
  `,
     data() {
@@ -294,8 +285,16 @@ Vue.component('product', {
             } else {
                 return this.brand + ' ' + this.product + ' no sale :(';
             }
+        },
+        shipping() {
+            if (this.premium) {
+                return "Free";
+            } else {
+                return 2.99
+            }
         }
     }
+
 })
 let app = new Vue({
     el: '#app',
