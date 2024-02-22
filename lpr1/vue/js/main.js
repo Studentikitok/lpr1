@@ -92,7 +92,6 @@ Vue.component('product-tabs', {
             required: true
         }
     },
-
     template: `
     <div>   
        <ul>
@@ -120,62 +119,32 @@ Vue.component('product-tabs', {
             <p>Shipping: {{ shipping }}</p>
         </div>
         <div v-show="selectedTab === 'Details'">
-            <product-detail></product-detail>
-            <product-detail :details="details" :sizes="sizes" :link="link" :description="description"></product-detail>
+            <product-detail :details="details" :link="link"></product-detail>
         </div>
      </div>
-
  `,
     data() {
         return {
             tabs: ['Reviews', 'Make a Review', 'Shipping', 'Details'],
             selectedTab: 'Reviews',  // устанавливается с помощью @click
             details: ['80% cotton', '20% polyester', 'Gender-neutral'],
-            sizes: ['S', 'M', 'L', 'XL', 'XXL', 'XXXL'],
             link: "https://www.amazon.com/s/ref=nb_sb_noss?url=search-alias%3Daps&field-keywords=socks",
-            description: "A pair of warm, fuzzy socks"
         }
     },
-
 })
 
 Vue.component('product-detail', {
     props:{
-        description:{
-            type: String,
-            required: true
-        },
         details:{
             type: Array,
             required: true
         },
-        sizes:{
-            type: Array,
-            required: true
-        },
-        link:{
-            type: "https://www.amazon.com/s/ref=nb_sb_noss?url=search-alias%3Daps&field-keywords=socks"
-        },
-
     },
-
     template:`
-        <p>{{ description }}</p>
         <ul>
             <li v-for="detail in details">{{ detail }}</li>
-            <li v-for="size in sizes">{{ size }}</li>
         </ul>
-        <div class="product-link">
-            <a :href="{{ link }}">More product like this</a>
-        </div>
-        
-    `,
-    data(){
-        return{
-            link: "https://www.amazon.com/s/ref=nb_sb_noss?url=search-alias%3Daps&field-keywords=socks",
-            description: "A pair of warm, fuzzy socks"
-        }
-    }
+    `
 })
 
 
@@ -184,7 +153,8 @@ Vue.component('product', {
         premium: {
             type: Boolean,
             required: true
-        }
+        },
+
     },
     template: `
    <div class="product">
@@ -197,9 +167,6 @@ Vue.component('product', {
            <p v-if="inStock">In stock</p>
            <p v-else class="disabledText">Out of Stock</p>
            <p>{{ sale }}</p>
-           <ul>
-               <li v-for="detail in details">{{ detail }}</li>
-           </ul>
            <div
                    class="color-box"
                    v-for="(variant, index) in variants"
@@ -207,7 +174,13 @@ Vue.component('product', {
                    :style="{ backgroundColor:variant.variantColor }"
                    @mouseover="updateProduct(index)"
            ></div>
-          
+           <ul>
+            <li v-for="size in sizes">{{ size }}</li>
+           </ul>
+           <p>{{ description }}</p>
+           <div class="product-link">
+                <a :href="link">More product like this</a>
+           </div>
            <button
                    v-on:click="addToCart"
                    :disabled="!inStock"
@@ -223,7 +196,7 @@ Vue.component('product', {
            </button>    
        </div>           
        <product-tabs :reviews="reviews" :shipping="shipping"></product-tabs>
-       
+       </div>
  `,
     data() {
         return {
@@ -247,7 +220,10 @@ Vue.component('product', {
                     variantOnSale: 0
                 }
             ],
-            reviews: []
+            reviews: [],
+            description: "A pair of warm, fuzzy socks",
+            sizes: ['S', 'M', 'L', 'XL', 'XXL', 'XXXL'],
+            link: "https://www.amazon.com/s/ref=nb_sb_noss?url=search-alias%3Daps&field-keywords=socks"
         }
     },
     mounted() {
