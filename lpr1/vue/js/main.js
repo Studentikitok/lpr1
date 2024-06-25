@@ -336,7 +336,7 @@ Vue.component('product', {
         averageRating() {
             if (this.reviews.length === 0) return 'No ratings yet';
             let sum = this.reviews.reduce((sum, review) => sum + review.rating, 0);
-            return (sum / this.reviews.length).toFixed(1); // Round to one decimal place
+            return (sum / this.reviews.length).toFixed(1);
         }
     }
 })
