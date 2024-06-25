@@ -248,7 +248,7 @@ Vue.component('product', {
                 :style="{ backgroundColor:variant.variantColor }"
                 @mouseover="updateProduct(index)"
             ></div>
-            <p>Rating: {{ ratingProduct }}</p>
+            <p>Rating: {{ averageRating }}</p>
             <div class="buttons">
                 <button
                     v-on:click="addToCart"
@@ -314,9 +314,6 @@ Vue.component('product', {
         },
         updateProduct(index) {
             this.selectedVariant = index;
-        },
-        ratingProduct(){
-            
         }
     },
     computed: {
@@ -335,6 +332,11 @@ Vue.component('product', {
             } else {
                 return this.brand + ' ' + this.product + ' no sale :(';
             }
+        },
+        averageRating() {
+            if (this.reviews.length === 0) return 'No ratings yet';
+            let sum = this.reviews.reduce((sum, review) => sum + review.rating, 0);
+            return (sum / this.reviews.length).toFixed(1); // Round to one decimal place
         }
     }
 })
